@@ -1,0 +1,34 @@
+#!/bin/bash
+#$ -S /bin/bash                                            
+#$ -cwd
+
+module load bwa
+module load samtools
+module load bedtools
+
+# needs 2 inputs in the commandline
+# 1. read.fastq.gz
+# 2. destination folder (subfolder of Sunny)
+
+
+fq_r1=$1_R1_001.fastq.gz
+fq_r2=$1_R2_001.fastq.gz
+bam=$1.bam
+sortbam=$1.sort
+coverage=$1_coverage.bedgraph
+
+genome=/ifs/data/proteomics/projects/Sunny/genome/hg38.fa
+dir=/ifs/data/proteomics/projects/Sunny/$2
+
+echo "fq_r1=${fq_r1}"
+echo "sortbam=$sortbam"
+
+#bwa mem -t 4 $genome $dir/${fq_r1} $dir/${fq_r2} | samtools view -b -S - > $dir/${bam}
+samtools sort $dir/${bam} $dir/${sortbam}
+samtools index $dir/${sortbam}.bam
+
+#samtools sort -O bam -T /tmp/$1 -m 2G -l 9 - -o ${sortbam}
+#samtools index ${sortbam}
+
+#bedtools genomecov -ibam $dir/${sortbam}.bam -bga > $dir/${coverage}
+

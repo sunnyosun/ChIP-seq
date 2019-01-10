@@ -1,0 +1,26 @@
+#!/bin/bash
+#$ -S /bin/bash
+#$ -cwd
+
+module load bwa
+module load samtools
+module load bedtools
+
+fq_r1=$1.fastq.gz
+fq_r2=$2.fastq.gz
+sam=$1.sam
+bam=$1.bam
+sortbam=$1.sorted.bam
+
+echo "fq_r1=${fq_r1}"
+echo "fq_r2=${fq_r2}"
+echo "sam=$sam"
+echo "bam=$bam"
+echo "sortbam=$sortbam"
+
+#bwa mem -t $SLURM_NTASKS /home/xs338/genome/L1HS.fa /vol/isg/encode/chipseq/${fq_r1} /vol/isg/encode/chipseq/${fq_r2} > ${sam}
+bwa mem -t 1 /home/xs338/genome/L1HS.fa /vol/isg/encode/chipseq/${fq_r1} /vol/isg/encode/chipseq/${fq_r2} > ${sam}
+samtools view -b -S ${sam} -o ${bam}
+samtools sort ${bam} -o ${sortbam}
+samtools index ${sortbam}
+bedtools genomecov -ibam ${sortbam} -bg > ${sortbam}-coverage.bedgraph
